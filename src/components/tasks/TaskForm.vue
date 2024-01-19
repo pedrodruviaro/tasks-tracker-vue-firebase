@@ -30,7 +30,12 @@ function handleSubmit() {
   <form @submit.prevent="handleSubmit" class="grid gap-4">
     <label>
       Task
-      <BaseTextarea v-model="enteredTitle" placeholder="Estudar por 15min..." label="Task" />
+      <BaseTextarea
+        v-auto-focus
+        v-model="enteredTitle"
+        placeholder="Estudar por 15min..."
+        label="Task"
+      />
     </label>
 
     <label>
