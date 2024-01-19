@@ -1,6 +1,7 @@
 <script setup>
 import { PhCircleNotch } from '@phosphor-icons/vue'
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
+import { RouterLink } from 'vue-router'
 
 defineProps({
   variant: {
@@ -24,28 +25,17 @@ defineProps({
     default: false
   },
   to: {
-    type: String,
+    type: [String, Object],
     required: false,
     default: '/'
   }
 })
 
 const baseButtonRef = ref('')
-let minWidth = 0
-
-onMounted(() => {
-  minWidth = baseButtonRef.value.getBoundingClientRect().width
-})
 </script>
 
 <template>
-  <button
-    :class="[variant]"
-    :disabled="loading"
-    ref="baseButtonRef"
-    :style="{ minWidth: `${minWidth}px` }"
-    v-if="!link"
-  >
+  <button :class="[variant]" :disabled="loading" ref="baseButtonRef" v-if="!link">
     <slot name="default" v-if="!loading" />
     <slot name="icon" v-if="!loading" />
 
@@ -54,20 +44,14 @@ onMounted(() => {
     </span>
   </button>
 
-  <a
-    v-else
-    :class="[variant]"
-    :disabled="loading"
-    ref="baseButtonRef"
-    :style="{ minWidth: `${minWidth}px` }"
-  >
+  <RouterLink v-else ref="baseButtonRef" :class="[variant]" :to="to">
     <slot name="default" v-if="!loading" />
     <slot name="icon" v-if="!loading" />
 
     <span v-else>
       <PhCircleNotch class="animate-spin" />
     </span>
-  </a>
+  </RouterLink>
 </template>
 
 <style scoped>

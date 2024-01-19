@@ -5,27 +5,31 @@ import { useFirebaseAuth } from 'vuefire'
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
 import { useRouter, useRoute } from 'vue-router'
 import { ref } from 'vue'
+import { useNotifications } from '@/composables/useNotification'
 
 const isLoading = ref(false)
 
-const provider = new GoogleAuthProvider()
 const auth = useFirebaseAuth()
 const router = useRouter()
 const route = useRoute()
+const toast = useNotifications()
+
+const provider = new GoogleAuthProvider()
 
 async function loginWithGoogle() {
   try {
     isLoading.value = true
 
-    const response = await signInWithPopup(auth, provider)
+    const { user } = await signInWithPopup(auth, provider)
 
-    if (!response.user) {
-      // erro
+    if (!user) {
+      toast.error('Algo deu errado... tente novamente mais tarde')
     }
 
     const redirect = route.query.redirect || '/dashboard'
-
     router.push(redirect)
+
+    toast.success(`Bem vindo${user.displayName ? `, ${user.displayName}` : ''}!`)
   } catch (error) {
     console.error(error)
   } finally {
