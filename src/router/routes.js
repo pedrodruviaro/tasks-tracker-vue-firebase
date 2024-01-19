@@ -8,6 +8,9 @@ export const routes = [
   {
     path: '/dashboard',
     name: 'dashboard',
+    meta: {
+      requiresAuth: true
+    },
     component: () => import('@/views/DashboardView.vue')
   }
 ]
