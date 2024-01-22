@@ -6,8 +6,10 @@ import BaseSelect from '@/components/base/BaseSelect.vue'
 import { PhArrowSquareOut } from '@phosphor-icons/vue'
 import { ref } from 'vue'
 import { useTasksStore } from '@/stores/tasks'
+import moment from 'moment'
 
 const categoryOptions = ['Estudo', 'Trabalho']
+const emit = defineEmits(['submited'])
 
 const tasksStore = useTasksStore()
 
@@ -15,14 +17,19 @@ const enteredTitle = ref('')
 const enteredDate = ref('')
 const enteredCategory = ref('')
 
-function handleSubmit() {
+async function handleSubmit() {
   const newTask = {
     title: enteredTitle.value,
-    finish_by: enteredDate.value,
-    category: enteredCategory.value
+    finish_by: moment(enteredDate.value).format(),
+    category: enteredCategory.value,
+    is_finished: false
   }
 
-  tasksStore.createTask(newTask)
+  const response = await tasksStore.createTask(newTask)
+
+  if (response.success && !response.error) {
+    emit('submited', true)
+  }
 }
 </script>
 
@@ -48,7 +55,7 @@ function handleSubmit() {
       <BaseSelect v-model="enteredCategory" :options="categoryOptions" emptyOption="Selecione" />
     </label>
 
-    <BaseButton type="submit" class="w-full"
+    <BaseButton type="submit" class="w-full" :loading="tasksStore.isLoading.create"
       >Criar
 
       <template #icon>

@@ -24,6 +24,6 @@ const isModalOpen = ref(false)
 
   <BaseModal v-model="isModalOpen">
     <h2 class="font-semibold text-lg mb-4">Criar nova task</h2>
-    <TaskForm />
+    <TaskForm @submited="isModalOpen = false" />
   </BaseModal>
 </template>
