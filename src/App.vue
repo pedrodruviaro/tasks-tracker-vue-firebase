@@ -1,11 +1,17 @@
 <script setup>
-import UiHeader from '@/components/ui/UiHeader.vue'
+import BaseButton from './components/base/BaseButton.vue'
 </script>
 
 <template>
-  <UiHeader />
+  <Suspense>
+    <template #default>
+      <RouterView />
+    </template>
 
-  <main class="my-10">
-    <RouterView />
-  </main>
+    <template #fallback>
+      <section>
+        <BaseButton :loading="true">Loading...</BaseButton>
+      </section>
+    </template>
+  </Suspense>
 </template>

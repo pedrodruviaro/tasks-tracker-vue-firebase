@@ -1,10 +1,11 @@
 <script setup>
 import BaseButton from '@/components/base/BaseButton.vue'
+import LoginLayout from '@/layouts/LoginLayout.vue'
 import { PhGoogleLogo } from '@phosphor-icons/vue'
-import { useFirebaseAuth } from 'vuefire'
+import { useFirebaseAuth, getCurrentUser } from 'vuefire'
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
 import { useRouter, useRoute } from 'vue-router'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useNotifications } from '@/composables/useNotification'
 
 const isLoading = ref(false)
@@ -36,22 +37,32 @@ async function loginWithGoogle() {
     isLoading.value = false
   }
 }
+
+onMounted(async () => {
+  const currentUser = await getCurrentUser()
+
+  if (currentUser) {
+    router.push({ name: 'dashboard' })
+  }
+})
 </script>
 
 <template>
-  <section class="wrapper pt-10">
-    <div class="grid gap-5 justify-items-center items-center">
-      <h1 class="font-semibold text-4xl lg:text-6xl">Tasks Tracker</h1>
-      <p class="text-center max-w-[35ch]">
-        Gerencie suas tarefas de forma fácil e aumente a produvidiade
-      </p>
+  <LoginLayout>
+    <section class="wrapper">
+      <div class="grid gap-5 justify-items-center items-center">
+        <h1 class="font-semibold text-4xl lg:text-6xl">Tasks Tracker</h1>
+        <p class="text-center max-w-[35ch]">
+          Gerencie suas tarefas de forma fácil e aumente a produvidiade
+        </p>
 
-      <BaseButton class="max-w-max" @click="loginWithGoogle" :loading="isLoading">
-        Login with Google
-        <template #icon>
-          <PhGoogleLogo />
-        </template>
-      </BaseButton>
-    </div>
-  </section>
+        <BaseButton class="max-w-max" @click="loginWithGoogle" :loading="isLoading">
+          Login with Google
+          <template #icon>
+            <PhGoogleLogo />
+          </template>
+        </BaseButton>
+      </div>
+    </section>
+  </LoginLayout>
 </template>
