@@ -4,33 +4,60 @@ import BaseTextarea from '@/components/base/BaseTextarea.vue'
 import BaseButton from '@/components/base/BaseButton.vue'
 import BaseSelect from '@/components/base/BaseSelect.vue'
 import { PhArrowSquareOut } from '@phosphor-icons/vue'
-import { ref } from 'vue'
+import { computed, reactive } from 'vue'
 import { useTasksStore } from '@/stores/tasks'
 import moment from 'moment'
+
+const props = defineProps({
+  task: {
+    type: Object,
+    required: false
+  }
+})
 
 const categoryOptions = ['Estudo', 'Trabalho']
 const emit = defineEmits(['submited'])
 
 const tasksStore = useTasksStore()
 
-const enteredTitle = ref('')
-const enteredDate = ref('')
-const enteredCategory = ref('')
+const initialState = {
+  title: '',
+  date: '',
+  category: categoryOptions[0]
+}
+
+if (props.task) {
+  initialState.title = props.task.title
+  initialState.date = moment(props.task.finish_by).format('YYYY-MM-DD')
+  initialState.category = props.task.category
+}
+
+const state = reactive(initialState)
 
 async function handleSubmit() {
-  const newTask = {
-    title: enteredTitle.value,
-    finish_by: moment(enteredDate.value).format(),
-    category: enteredCategory.value,
-    is_finished: false
+  const action = props.task ? 'editTask' : 'createTask'
+
+  let task = {
+    title: state.title,
+    finish_by: moment(state.date).format(),
+    category: state.category,
+    is_finished: props.task?.is_finished || false
   }
 
-  const response = await tasksStore.createTask(newTask)
+  if (action === 'editTask') {
+    task.id = props.task.id
+  }
+
+  const response = await tasksStore[action](task)
 
   if (response.success && !response.error) {
     emit('submited', true)
   }
 }
+
+const buttonLabel = computed(() => {
+  return props.task ? 'Editar' : 'Criar'
+})
 </script>
 
 <template>
@@ -39,7 +66,7 @@ async function handleSubmit() {
       Task
       <BaseTextarea
         v-auto-focus
-        v-model="enteredTitle"
+        v-model="state.title"
         placeholder="Estudar por 15min..."
         label="Task"
       />
@@ -47,16 +74,16 @@ async function handleSubmit() {
 
     <label>
       Data de entrega
-      <BaseInput v-model="enteredDate" type="date" />
+      <BaseInput v-model="state.date" type="date" />
     </label>
 
     <label>
       Categoria
-      <BaseSelect v-model="enteredCategory" :options="categoryOptions" emptyOption="Selecione" />
+      <BaseSelect v-model="state.category" :options="categoryOptions" emptyOption="Selecione" />
     </label>
 
-    <BaseButton type="submit" class="w-full" :loading="tasksStore.isLoading.create"
-      >Criar
+    <BaseButton type="submit" class="w-full" :loading="tasksStore.isLoading">
+      {{ buttonLabel }}
 
       <template #icon>
         <PhArrowSquareOut />

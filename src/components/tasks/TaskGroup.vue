@@ -1,8 +1,7 @@
 <script setup>
-import BaseButton from '@/components/base/BaseButton.vue'
 import moment from 'moment'
-import { PhTrashSimple, PhPencilSimple } from '@phosphor-icons/vue'
 import { computed } from 'vue'
+import TaskItem from '@/components/tasks/TaskItem.vue'
 
 const props = defineProps({
   date: {
@@ -28,35 +27,12 @@ const isTaskLate = computed(() => {
     <h3 class="font-semibold text-lg mb-2">{{ date }}</h3>
 
     <ul>
-      <li
+      <TaskItem
         v-for="task in taskGroup"
         :key="task.id"
-        class="p-4 border-l-4 border border-zinc-900 border-b-0 border-r border-t grid gap-4 lg:flex lg:items-center lg:justify-between"
+        :task="task"
         :class="{ 'bg-red-300': isTaskLate }"
-      >
-        <div class="grid gap-4">
-          <span class="bg-zinc-300 rounded max-w-max px-2 py-1 text-sm" v-if="task.category">{{
-            task.category
-          }}</span>
-          <p class="text-lg">
-            {{ task.title }}
-          </p>
-        </div>
-
-        <div class="flex items-center gap-4">
-          <BaseButton variant="icon" class="border">
-            <template #icon>
-              <PhPencilSimple size="19" />
-            </template>
-          </BaseButton>
-
-          <BaseButton variant="icon" class="bg-red-100">
-            <template #icon>
-              <PhTrashSimple size="18" />
-            </template>
-          </BaseButton>
-        </div>
-      </li>
+      />
     </ul>
   </article>
 </template>

@@ -1,12 +1,28 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { PhPlusCircle } from '@phosphor-icons/vue'
 import BaseModal from '@/components/base/BaseModal.vue'
 import BaseButton from '@/components/base/BaseButton.vue'
-
 import TaskForm from '@/components/tasks/TaskForm.vue'
+import { useEventBus } from '@vueuse/core'
+
+const bus = useEventBus('openModal')
+
+bus.on(listener)
 
 const isModalOpen = ref(false)
+const taskToEdit = ref(null)
+
+function listener(task) {
+  taskToEdit.value = task
+  isModalOpen.value = true
+}
+
+watch(isModalOpen, (val) => {
+  if (val === false) {
+    taskToEdit.value = null
+  }
+})
 </script>
 
 <template>
@@ -24,6 +40,6 @@ const isModalOpen = ref(false)
 
   <BaseModal v-model="isModalOpen">
     <h2 class="font-semibold text-lg mb-4">Criar nova task</h2>
-    <TaskForm @submited="isModalOpen = false" />
+    <TaskForm @submited="isModalOpen = false" :task="taskToEdit" />
   </BaseModal>
 </template>

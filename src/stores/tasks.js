@@ -1,6 +1,16 @@
 import { defineStore } from 'pinia'
-import { ref, reactive, computed } from 'vue'
-import { addDoc, collection, onSnapshot, query, where, orderBy } from 'firebase/firestore'
+import { ref, computed } from 'vue'
+import {
+  addDoc,
+  collection,
+  onSnapshot,
+  query,
+  where,
+  orderBy,
+  doc,
+  deleteDoc,
+  updateDoc
+} from 'firebase/firestore'
 import { useFirestore, useCurrentUser } from 'vuefire'
 import { useNotifications } from '@/composables/useNotification'
 import moment from 'moment'
@@ -30,9 +40,7 @@ export const useTasksStore = defineStore('tasks', () => {
     return obj
   })
 
-  const isLoading = reactive({
-    create: false
-  })
+  const isLoading = ref(false)
 
   function getTasks() {
     const q = query(
@@ -44,7 +52,10 @@ export const useTasksStore = defineStore('tasks', () => {
       tasks.value = []
 
       querySnapshot.forEach((doc) => {
-        tasks.value.push(doc.data())
+        const data = doc.data()
+        data.id = doc.id
+
+        tasks.value.push(data)
       })
     })
 
@@ -53,7 +64,7 @@ export const useTasksStore = defineStore('tasks', () => {
 
   async function createTask(task) {
     try {
-      isLoading.create = true
+      isLoading.value = true
 
       const response = await addDoc(collection(db, 'tasks'), {
         ...task,
@@ -70,16 +81,33 @@ export const useTasksStore = defineStore('tasks', () => {
 
       return { error: true, success: false, data: null }
     } finally {
-      isLoading.create = false
+      isLoading.value = false
     }
   }
 
-  async function editTask(taskId) {
-    console.log(taskId)
+  async function editTask(task) {
+    try {
+      isLoading.value = true
+
+      const docRef = doc(db, 'tasks', task.id)
+
+      const response = await updateDoc(docRef, task)
+
+      if (response) {
+        toast.success('Tarefa criada com sucesso!')
+      }
+
+      return { error: null, success: true, data: response }
+    } catch (error) {
+      toast.error('Algo deu errado, não foi possível atualizar a tarefa')
+      return { error: true, success: false, data: null }
+    } finally {
+      isLoading.value = false
+    }
   }
 
   async function deleteTask(taskId) {
-    console.log(taskId)
+    await deleteDoc(doc(db, 'tasks', taskId))
   }
 
   return {
