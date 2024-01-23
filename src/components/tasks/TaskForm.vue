@@ -6,7 +6,10 @@ import BaseSelect from '@/components/base/BaseSelect.vue'
 import { PhArrowSquareOut } from '@phosphor-icons/vue'
 import { computed, reactive } from 'vue'
 import { useTasksStore } from '@/stores/tasks'
+import { categoryOptions } from '@/common/categories'
 import moment from 'moment'
+
+const tasksStore = useTasksStore()
 
 const props = defineProps({
   task: {
@@ -15,14 +18,11 @@ const props = defineProps({
   }
 })
 
-const categoryOptions = ['Estudo', 'Trabalho']
 const emit = defineEmits(['submited'])
-
-const tasksStore = useTasksStore()
 
 const initialState = {
   title: '',
-  date: '',
+  date: moment(new Date()).format('YYYY-MM-DD'),
   category: categoryOptions[0]
 }
 
@@ -69,17 +69,25 @@ const buttonLabel = computed(() => {
         v-model="state.title"
         placeholder="Estudar por 15min..."
         label="Task"
+        required
       />
     </label>
 
-    <label>
-      Data de entrega
-      <BaseInput v-model="state.date" type="date" />
-    </label>
+    <div>
+      <label>
+        Categoria
+        <BaseSelect
+          v-model="state.category"
+          :options="categoryOptions"
+          emptyOption="Selecione"
+          required
+        />
+      </label>
+    </div>
 
     <label>
-      Categoria
-      <BaseSelect v-model="state.category" :options="categoryOptions" emptyOption="Selecione" />
+      Data de entrega
+      <BaseInput v-model="state.date" type="date" required />
     </label>
 
     <BaseButton type="submit" class="w-full" :loading="tasksStore.isLoading">

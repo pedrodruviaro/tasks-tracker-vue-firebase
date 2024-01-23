@@ -1,11 +1,12 @@
 <script setup>
 import TaskGroup from '@/components/tasks/TaskGroup.vue'
 import { useTasksStore } from '@/stores/tasks'
-import { onBeforeUnmount } from 'vue'
+import { onBeforeUnmount, ref } from 'vue'
 
 const tasksStore = useTasksStore()
 
-const { unsubscribe } = tasksStore.getTasks()
+const filterTasksByFinishState = ref(false)
+const { unsubscribe } = tasksStore.getTasks(filterTasksByFinishState.value)
 
 onBeforeUnmount(() => unsubscribe())
 </script>

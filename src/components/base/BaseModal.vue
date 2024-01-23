@@ -17,7 +17,7 @@ function close() {
       v-if="modelValue"
       class="fixed inset-0 bg-zinc-700 bg-opacity-50 grid place-items-center"
     >
-      <div class="bg-zinc-50 rounded-md shadow-sm p-4 relative w-full mx-4 max-w-[40rem]">
+      <div class="bg-zinc-50 rounded-md shadow-sm p-4 relative w-full m-4 max-w-[40rem]">
         <button
           @click="close"
           aria-label="Fechar modal"

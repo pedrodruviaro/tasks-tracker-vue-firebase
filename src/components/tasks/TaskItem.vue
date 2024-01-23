@@ -1,6 +1,6 @@
 <script setup>
 import BaseButton from '@/components/base/BaseButton.vue'
-import { PhTrashSimple, PhPencilSimple } from '@phosphor-icons/vue'
+import { PhTrashSimple, PhPencilSimple, PhCheck } from '@phosphor-icons/vue'
 import { useTasksStore } from '@/stores/tasks'
 import { ref } from 'vue'
 import { useNotifications } from '@/composables/useNotification'
@@ -50,6 +50,16 @@ function handleEdit(task) {
     </div>
 
     <div class="flex items-center gap-4">
+      <BaseButton
+        variant="icon"
+        class="border bg-blue-200"
+        @click="tasksStore.completeTask(task.id)"
+      >
+        <template #icon>
+          <PhCheck size="19" />
+        </template>
+      </BaseButton>
+
       <BaseButton variant="icon" class="border" @click="handleEdit(task)">
         <template #icon>
           <PhPencilSimple size="19" />

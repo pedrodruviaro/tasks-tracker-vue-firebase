@@ -46,7 +46,8 @@ export const useTasksStore = defineStore('tasks', () => {
     const q = query(
       collection(db, 'tasks'),
       orderBy('finish_by'),
-      where('user_id', '==', user.value.uid)
+      where('user_id', '==', user.value.uid),
+      where('is_finished', '==', false)
     )
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       tasks.value = []
@@ -110,6 +111,27 @@ export const useTasksStore = defineStore('tasks', () => {
     await deleteDoc(doc(db, 'tasks', taskId))
   }
 
+  async function completeTask(taskId) {
+    try {
+      isLoading.value = true
+
+      const docRef = doc(db, 'tasks', taskId)
+
+      const response = await updateDoc(docRef, { is_finished: true })
+
+      if (response) {
+        toast.success('Tarefa entregue com sucesso!')
+      }
+
+      return { error: null, success: true, data: response }
+    } catch (error) {
+      toast.error('Algo deu errado, não foi possível entregar a tarefa')
+      return { error: true, success: false, data: null }
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   return {
     tasksByDate,
     tasks,
@@ -117,6 +139,7 @@ export const useTasksStore = defineStore('tasks', () => {
     createTask,
     editTask,
     deleteTask,
-    getTasks
+    getTasks,
+    completeTask
   }
 })
